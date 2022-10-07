@@ -1,5 +1,5 @@
 import React from "react";
-import { AiOutlineUser, AiOutlineLock } from "react-icons/ai";
+import { BsCheck2, BsCheck2All } from "react-icons/ai";
 import {
   MainContainer,
   ContainerLeft,
@@ -7,20 +7,24 @@ import {
   ContentText,
   ContentTextH1,
   ContentTextP,
-  LoginForm,
-  LoginFormH1,
+  CadastroForm,
+  CadastroFormH1,
   Input,
+  InputNome,
+  InputSobrenome,
   InputEmail,
   InputPassword,
-  LoginFormButton,
+  ChecklistPassword,
+  Icone,
+  InputConfirmPassword,
+  CadastroFormButton,
   ContainerRight,
   Erro,
-  Icone,
 } from "./styles";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Login() {
+function Cadastro() {
   const [focusUser, setFocusUser] = useState(false);
   const [focusPassword, setFocusPassword] = useState(false);
   const [user, setUser] = useState("");
@@ -45,12 +49,17 @@ function Login() {
           <ContentText>
             <ContentTextH1>Olá,</ContentTextH1>
             <ContentTextP>
-              Para continuar navegando de forma <br /> segura, efetue o login na
-              rede.
+              Para acessar a rede de forma <br /> segura, efetue seu cadastro.
             </ContentTextP>
           </ContentText>
-          <LoginForm>
-            <LoginFormH1>Login</LoginFormH1>
+          <CadastroForm>
+            <CadastroFormH1>Cadastro</CadastroFormH1>
+            <InputNome>
+              <Input type="text" placeholder="Insira aqui seu primeiro nome" />
+            </InputNome>
+            <InputSobrenome>
+              <Input type="text" placeholder="Insira aqui seu sobrenome" />
+            </InputSobrenome>
             <InputEmail>
               <Input
                 onBlur={(event) =>
@@ -61,14 +70,14 @@ function Login() {
                 onChange={(event) => setUser(event.target.value)}
                 value={user}
                 type="text"
-                placeholder="E-mail"
+                placeholder="Insira aqui seu e-mail"
                 noValidated={noValidated}
                 required
                 onFocus={() => setFocusUser(true)}
               />
-              <Icone selected={user} focus={focusUser}>
+              {/* <Icone selected={user} focus={focusUser}>
                 <AiOutlineUser size={25} />
-              </Icone>
+              </Icone> */}
             </InputEmail>
             <InputPassword>
               <Input
@@ -80,15 +89,25 @@ function Login() {
                 onChange={(event) => setPassword(event.target.value)}
                 value={password}
                 type="password"
-                placeholder="Senha"
+                placeholder="Crie uma senha válida"
                 noValidated={noValidated}
                 required
                 onFocus={() => setFocusPassword(true)}
               />
-              <Icone selected={password} focus={focusPassword}>
+              {/* <Icone selected={password} focus={focusPassword}>
                 <AiOutlineLock size={25} />
-              </Icone>
+              </Icone> */}
             </InputPassword>
+
+            <ChecklistPassword>
+              <ul>
+                <li>6 caracteres</li>
+                <li>caratere especial</li>
+                <li>número</li>
+                <li>letra maiúscula</li>
+                <li>letra minúscula</li>
+              </ul>
+            </ChecklistPassword>
 
             {noValidated ? (
               <Erro>Ops, usuário ou senha inválidos. Tente novamente!</Erro>
@@ -96,10 +115,20 @@ function Login() {
               ""
             )}
 
-            <LoginFormButton onClick={formValidation}>
-              Continuar
-            </LoginFormButton>
-          </LoginForm>
+            <InputConfirmPassword>
+              <Input
+                type="password"
+                placeholder="Repita a senha que você criou acima"
+              />
+            </InputConfirmPassword>
+
+            <CadastroFormButton onClick={formValidation}>
+              Cadastrar
+            </CadastroFormButton>
+            <p>
+              <a>Se você já possui cadastro clique aqui</a>
+            </p>
+          </CadastroForm>
         </ContentLeft>
       </ContainerLeft>
       <ContainerRight />
@@ -107,4 +136,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Cadastro;
