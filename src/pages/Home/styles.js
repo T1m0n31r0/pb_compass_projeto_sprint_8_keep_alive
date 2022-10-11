@@ -300,6 +300,12 @@ export const SideRight = styled.div`
   }
 `;
 
+export const WellCome = styled.h3`
+  margin: 8px 8px 0 8px;
+  text-align: center;
+  color: #fff;
+`;
+
 export const DescriptionP = styled.p`
   margin: 8px 8px 0 8px;
   font-size: 0.75rem;

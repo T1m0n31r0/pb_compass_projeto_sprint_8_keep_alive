@@ -18,7 +18,7 @@ import {
   Icone,
 } from "./styles";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
   const [focusUser, setFocusUser] = useState(false);
@@ -99,6 +99,8 @@ function Login() {
             <LoginFormButton onClick={formValidation}>
               Continuar
             </LoginFormButton>
+            <br />
+            <Link to="/cadastro">&nbsp;Não possui cadastro? Clique aqui!</Link>
           </LoginForm>
         </ContentLeft>
       </ContainerLeft>

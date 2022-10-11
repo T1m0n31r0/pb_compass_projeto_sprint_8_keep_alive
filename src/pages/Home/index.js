@@ -12,6 +12,7 @@ import {
   TextContainerH1,
   TextContainerP,
   DescriptionP,
+  WellCome,
   Pipe,
   Timer,
   Online,
@@ -74,6 +75,7 @@ function Home() {
 
         <Footer>
           <SideLeft>
+            <WellCome>Bem vindo</WellCome>
             <DescriptionP>
               Essa janela do navegador é usada para manter sua sessão de
               autenticação ativa. Deixe-a <br />
