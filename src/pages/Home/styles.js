@@ -302,7 +302,8 @@ export const SideRight = styled.div`
 
 export const WellCome = styled.h3`
   margin: 8px 8px 0 8px;
-  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
   color: #fff;
 `;
 

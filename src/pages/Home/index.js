@@ -27,12 +27,20 @@ import { Time } from "../../components/Time";
 import Location from "../../components/Location";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { FirebaseApp } from "../Cadastro";
+import { getAuth } from "firebase/auth";
 
 function Home() {
-  const [cont, setCont] = useState(60);
+  const [cont, setCont] = useState(600);
   const navigate = useNavigate();
 
+  const auth = getAuth(FirebaseApp);
+
+  const [name, setName] = useState();
+
   useEffect(() => {
+    setTimeout(() => setName(auth.currentUser?.displayName.split(" ")[0]));
+
     const interval = setInterval(() => {
       setCont((cont) => cont - 1);
       if (cont === 0) {
@@ -75,7 +83,8 @@ function Home() {
 
         <Footer>
           <SideLeft>
-            <WellCome>Bem vindo</WellCome>
+            <WellCome>Bem vindo,</WellCome>
+            <p>{name}!</p>
             <DescriptionP>
               Essa janela do navegador é usada para manter sua sessão de
               autenticação ativa. Deixe-a <br />
@@ -96,7 +105,16 @@ function Home() {
                 <br />
                 Navegando
               </Online>
-              <Logout href="/">Logout</Logout>
+              <Logout
+                onClick={() =>
+                  auth.signOut().then(() => {
+                    navigate("/");
+                  })
+                }
+                href="/"
+              >
+                Logout
+              </Logout>
             </RightCorner>
           </SideRight>
         </Footer>

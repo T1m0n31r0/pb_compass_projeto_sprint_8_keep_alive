@@ -1,5 +1,6 @@
 import React from "react";
 import { AiOutlineUser, AiOutlineLock } from "react-icons/ai";
+import { getAuth } from "firebase/auth";
 import {
   MainContainer,
   ContainerLeft,
@@ -16,9 +17,12 @@ import {
   ContainerRight,
   Erro,
   Icone,
+  Navegar,
 } from "./styles";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FirebaseApp } from "../Cadastro";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 function Login() {
   const [focusUser, setFocusUser] = useState(false);
@@ -30,13 +34,16 @@ function Login() {
 
   const formValidation = (event) => {
     event.preventDefault();
+    const auth = getAuth(FirebaseApp);
 
-    let regEmail = /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/;
-
-    if (regEmail.test(user) && password.length > 5) {
-      navigate("/home");
-      setNoValidated(false);
-    } else return setNoValidated(true);
+    signInWithEmailAndPassword(auth, user, password)
+      .then(() => {
+        navigate("/home");
+        setNoValidated(false);
+      })
+      .catch(() => {
+        setNoValidated(true);
+      });
   };
   return (
     <MainContainer>
@@ -100,7 +107,10 @@ function Login() {
               Continuar
             </LoginFormButton>
             <br />
-            <Link to="/cadastro">&nbsp;Não possui cadastro? Clique aqui!</Link>
+            <Navegar>
+              Não possui cadastro?{" "}
+              <Link to="/cadastro">&nbsp;Clique aqui!</Link>
+            </Navegar>
           </LoginForm>
         </ContentLeft>
       </ContainerLeft>

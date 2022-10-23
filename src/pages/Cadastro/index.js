@@ -10,7 +10,6 @@ import {
   CadastroFormH1,
   Input,
   InputNome,
-  InputSobrenome,
   InputEmail,
   InputPassword,
   InputConfirmPassword,
@@ -19,21 +18,72 @@ import {
   ContainerRight,
   AlertError,
   Navegar,
+  Content,
+  Title,
+  Text,
 } from "./styles";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { validateEmail, validatePassword } from "../../utils/regex";
+// Importações do Firebase
+import { initializeApp } from "firebase/app";
+import { addDoc, collection, getDocs, getFirestore } from "firebase/firestore";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  updateProfile,
+} from "firebase/auth";
+
+// Inicialização do Firebase
+export const FirebaseApp = initializeApp({
+  apiKey: "AIzaSyBlRUY3f-lv5nNGVmWoWqgp3WiKbQScJg8",
+  authDomain: "keepalive-72076.firebaseapp.com",
+  projectId: "keepalive-72076",
+});
 
 function Cadastro() {
   // Estado das variáveis: firstName, lastName, email, password e confirmPassword
   const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  // Conexão com o Firebase
+  const db = getFirestore(FirebaseApp);
+  const [users, setUsers] = useState([]);
+
+  const userCollectionRef = collection(db, "users");
+
+  // Função cadastrar usuário
+
+  function cadastrarUser() {
+    const auth = getAuth(FirebaseApp);
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        updateProfile(userCredential.user, {
+          displayName: firstName,
+        });
+      })
+      .then(() => {
+        addDoc(userCollectionRef, {
+          firstName,
+          email,
+        });
+      })
+      .then(() => navigate("/"))
+
+      .catch((error) => console.log(error));
+  }
+
+  useEffect(() => {
+    const getUsers = async () => {
+      const data = await getDocs(userCollectionRef);
+      setUsers(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    };
+    getUsers();
+  }, []);
+  // Fim da conexão com o Firebase
 
   const [firstNameErro, setFirstNameErro] = useState(false);
-  const [lastNameErro, setLastNameErro] = useState(false);
   const [emailErro, setEmailErro] = useState(false);
   const [passwordErro, setPasswordErro] = useState(false);
   const [confirmPasswordErro, setConfirmPasswordErro] = useState(false);
@@ -59,17 +109,10 @@ function Cadastro() {
     event.preventDefault();
 
     // Validação do nome
-    if (firstName.length < 2) {
+    if (firstName.length < 4) {
       setFirstNameErro(true);
     } else {
       setFirstNameErro(false);
-    }
-
-    // Validação do sobrenome
-    if (lastName.length < 2) {
-      setLastNameErro(true);
-    } else {
-      setLastNameErro(false);
     }
 
     // Validação do e-mail
@@ -85,6 +128,7 @@ function Cadastro() {
     } else {
       setPasswordErro(false);
     }
+    console.log(validatePassword);
 
     // Confirmação da senha
     if (confirmPassword !== password) {
@@ -92,16 +136,12 @@ function Cadastro() {
     } else {
       setConfirmPasswordErro(false);
     }
-    if (
-      !firstNameErro &&
-      !lastNameErro &&
-      !emailErro &&
-      !passwordErro &&
-      !confirmPasswordErro
-    ) {
-      navigate("/");
-      setNoValidated(false);
-    } else return setNoValidated(true);
+    if (!firstNameErro && !emailErro && !passwordErro && !confirmPasswordErro) {
+   
+      cadastrarUser();
+    } 
+    
+    else return setNoValidated(false);
   };
 
   return (
@@ -131,39 +171,15 @@ function Cadastro() {
               {/* Campo de cadastro de nome */}
               <Input
                 type="text"
-                placeholder="Insira aqui seu primeiro nome"
+                placeholder="Insira seu nome completo"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
                 noValidated={noValidated}
               />
               {/* Alerta de erro caso o nome não atenda os requisitos de validação */}
-              {firstNameErro && (
-                <AlertError>
-                  O nome deve conter pelo menos 2 caracteres!
-                </AlertError>
-              )}
+              {firstNameErro && <AlertError>O nome inválido!</AlertError>}
             </InputNome>
-
-            {/* Div do cadastro de sobrenome */}
-            <InputSobrenome>
-              Sobrenome
-              {/* Campo de cadastro de sobrenome */}
-              <Input
-                type="text"
-                placeholder="Insira aqui seu sobrenome"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                required
-                noValidated={noValidated}
-              />
-              {/* Alerta de erro caso o sobrenome não atenda os requisitos de validação */}
-              {lastNameErro && (
-                <AlertError>
-                  O sobrenome deve conter pelo menos 2 caracteres!
-                </AlertError>
-              )}
-            </InputSobrenome>
 
             {/* Div do cadastro de e-mail */}
             <InputEmail>
@@ -171,7 +187,7 @@ function Cadastro() {
               {/* Campo de cadastro de e-mail */}
               <Input
                 type="text"
-                placeholder="Insira aqui seu melhor e-mail"
+                placeholder="Insira seu melhor e-mail"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -187,7 +203,7 @@ function Cadastro() {
               {/* Campo de cadastro de senha */}
               <Input
                 type="password"
-                placeholder="Crie uma senha válida"
+                placeholder="Crie uma senha"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -197,15 +213,32 @@ function Cadastro() {
                 noValidated={noValidated}
               />
               {/* Alerta de erro caso a senha digitada não atenda os requisitos de validação */}
-              {passwordErro && (
-                <AlertError>
-                  A senha digitada não atende aos requisitos!
-                </AlertError>
-              )}
+              {passwordErro && <AlertError>A senha digitada não atende aos requisitos!</AlertError>
+              }
+              {/* <Content> */}
+              {/* <Title>Sua senha deve conter:</Title>
+                <br />
+                <View>
+                  <Text>No mínimo 6 caracteres</Text>
+                </View>
+                <View>
+                  <Text>Letra maiúscula</Text>
+                </View>
+                <View>
+                  <Text>Letra minúscula</Text>
+                </View>
+                <View>
+                  <Text>Número</Text>
+                </View>
+                <View>
+                  <Text>Caractere especial</Text>
+                </View> */}
+              {/* </Content>
+              <br /> */}
             </InputPassword>
 
             {/* Div contendo os critérios de validação da senha */}
-            <UnacceptedPassword validated={passwordRequirement.count}>
+            {/* <UnacceptedPassword validated={passwordRequirement.count}>
               6 caracteres
             </UnacceptedPassword>
             <br />
@@ -216,7 +249,7 @@ function Cadastro() {
             <UnacceptedPassword>letra maiúscula</UnacceptedPassword>
             <br />
             <UnacceptedPassword>letra minúscula</UnacceptedPassword>
-            <br />
+            <br /> */}
 
             {/* Div da confirmação da senha cadastrada */}
             <InputConfirmPassword>
@@ -224,18 +257,15 @@ function Cadastro() {
               {/* Campo de confirmação da senha cadastrada */}
               <Input
                 type="password"
-                placeholder="Repita a senha que você criou acima"
+                placeholder="Repita a senha"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 noValidated={noValidated}
               />
               {/* Alerta de erro caso a senha digitada não seja igual à cadastrada */}
-              {confirmPasswordErro && (
-                <AlertError>
-                  A senha informada não confere com a senha digitada acima!
-                </AlertError>
-              )}
+              {confirmPasswordErro && 
+                <AlertError>A senha informada não confere com a senha digitada acima!</AlertError>}
             </InputConfirmPassword>
 
             {/* Botão de confirmação de cadastro */}
